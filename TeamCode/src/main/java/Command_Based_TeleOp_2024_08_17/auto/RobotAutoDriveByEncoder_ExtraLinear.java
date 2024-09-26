@@ -166,8 +166,8 @@ public class RobotAutoDriveByEncoder_ExtraLinear extends LinearOpMode {
                 backLeft.setPower(Math.abs(0.25));
 //
                 //responsible for powering motors
-                frontRight.setPower(Math.abs(-0.25)); //speed isnt 0.25
-                backRight.setPower(Math.abs(-0.25));
+                frontRight.setPower(Math.abs(0.25)); //speed isnt 0.25
+                backRight.setPower(Math.abs(0.25));
                 // keep looping while we are still active, and there is time left, and both motors are running.
                 //TODO if something goes wrong read this again
                 // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
