@@ -29,13 +29,16 @@
 
 package Command_Based_TeleOp_2024_08_17.auto;
 
-import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.acmerobotics.dashboard.FtcDashboard;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
@@ -67,12 +70,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
 
     /* Declare OpMode members. */
+
+
     private DcMotor frontLeft = null;
     private DcMotor frontRight = null;
     private DcMotor backLeft = null;
     private DcMotor backRight = null;
 
-    private ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime runtime = new ElapsedTime();
 
     // Calculate the COUNTS_PER_INCH for your specific drive train.
     // Go to your motor vendor website to determine your motor's COUNTS_PER_MOTOR_REV
@@ -80,14 +85,21 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
     // For example, use a value of 2.0 for a 12-tooth spur gear driving a 24-tooth spur gear.
     // This is gearing DOWN for less speed and more torque.
     // For gearing UP, use a gear ratio less than 1.0. Note this will affect the direction of wheel rotation.
-    //TODO check these are correct
+    public static final double     DRIVE_SPEED             = 0.25;
+    public static final double     TURN_SPEED              = 0.5;
+
     static final double     COUNTS_PER_MOTOR_REV    = 28 ;    // REV ultraplanetary motor
     static final double     DRIVE_GEAR_REDUCTION    = 20 ;     // External Gearing.
     static final double     WHEEL_DIAMETER_INCHES   = 3 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.5;
-    static final double     TURN_SPEED              = 0.5;
+
+    private final FtcDashboard dashboard = FtcDashboard.getInstance();
+    private final Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
+
+
+
 
     @Override
     public void runOpMode() {
@@ -117,12 +129,13 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Starting at",  "%7d :%7d",
+        dashboardTelemetry.addData("Starting at",  "%7d :%7d",
                 frontLeft.getCurrentPosition(),
                 frontRight.getCurrentPosition(),
                 backRight.getCurrentPosition(),
                 backLeft.getCurrentPosition());
 
+        dashboardTelemetry.update();
         telemetry.update();
 
         // Wait for the game to start (driver presses START)
@@ -130,12 +143,12 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED,  48000,  48000, 5);  // S1: Forward 47 Inches with 5 Sec timeout
-//        encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+        encoderDrive(DRIVE_SPEED,  24,  24, 5);  // S1: Forward 47 Inches with 5 Sec timeout
+        encoderDrive(TURN_SPEED,   24, -24, 5);  // S2: Turn Right 12 Inches with 4 Sec timeout
 //        encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
+        dashboardTelemetry.addData("Path", "Complete");
+        dashboardTelemetry.update();
         sleep(1000);  // pause to display final telemetry message.
     }
 
@@ -173,6 +186,13 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
             backLeft.setTargetPosition(newBackLeftTarget);
             backRight.setTargetPosition(newBackRightTarget);
 
+            dashboardTelemetry.addData("fL target ", frontLeft.getTargetPosition());
+            dashboardTelemetry.addData("fR target", frontRight.getTargetPosition());
+            dashboardTelemetry.addData("bL target", backLeft.getTargetPosition());
+            dashboardTelemetry.addData("bR target", backRight.getTargetPosition());
+
+
+
             // Turn On RUN_TO_POSITION
             frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -181,12 +201,12 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
 
             // reset the timeout time and start motion.
             runtime.reset();
-            frontLeft.setPower(Math.abs(0.25));
-            backLeft.setPower(Math.abs(0.25));
+            frontLeft.setPower(Math.abs(speed));
+            backLeft.setPower(Math.abs(speed));
 //
             //responsible for powering motors
-            frontRight.setPower(Math.abs(0.25)); //speed isnt 0.25
-            backRight.setPower(Math.abs(0.25));
+            frontRight.setPower(Math.abs(speed)); //speed isnt 0.25
+            backRight.setPower(Math.abs(speed));
             // keep looping while we are still active, and there is time left, and both motors are running.
             //TODO if something goes wrong read this again
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
@@ -201,13 +221,13 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
                 // Display it for the driver.
 
 
-                telemetry.addData("fL ", frontLeft.getCurrentPosition());
-                telemetry.addData("fR ", frontRight.getCurrentPosition());
-                telemetry.addData("bL ", backLeft.getCurrentPosition());
-                telemetry.addData("bR ", backRight.getCurrentPosition());
+                dashboardTelemetry.addData("fL ", frontLeft.getCurrentPosition());
+                dashboardTelemetry.addData("fR ", frontRight.getCurrentPosition());
+                dashboardTelemetry.addData("bL ", backLeft.getCurrentPosition());
+                dashboardTelemetry.addData("bR ", backRight.getCurrentPosition());
 
 
-                telemetry.update();
+                dashboardTelemetry.update();
             }
 
             // Stop all motion;
@@ -224,5 +244,9 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
 
             sleep(250);   // optional pause after each move.
         }
+
+
+
+
     }
 }
