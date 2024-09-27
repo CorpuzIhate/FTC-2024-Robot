@@ -27,7 +27,7 @@ public class RobotContainer extends CommandOpMode {
     private  TelemetryManagerSubsystem telemetryManagerSub;
     private   VacuumSubsystem vacuumSubsystem;
 
-    private BNO055IMU imu;
+
 
 
     double fwdPwr;
@@ -51,25 +51,11 @@ public class RobotContainer extends CommandOpMode {
         telemetryManagerSub = new TelemetryManagerSubsystem();
         vacuumSubsystem = new VacuumSubsystem(m_HardwareMap);
 
-        //TODO move motor, sensor and IMU setups into their subsystem
-        //TODO put constant tags into constants
-
 
         driverOP = new GamepadEx(gamepad1);
 
 
-        BNO055IMU.Parameters myIMUparameters;
 
-        myIMUparameters = new BNO055IMU.Parameters();
-
-
-        myIMUparameters.angleUnit = myIMUparameters.angleUnit.RADIANS;
-
-        myIMUparameters.calibrationDataFile = "BNO055IMUCalibration.json";
-
-        imu = hardwareMap.get(BNO055IMU.class, Constants.Sensors.IMU_tag);
-
-        imu.initialize(myIMUparameters);
 
         telemetryManagerSub.setDefaultCommand(new PerpetualCommand(new TelemetryManagerCMD(telemetryManagerSub)));
 

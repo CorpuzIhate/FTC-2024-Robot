@@ -3,6 +3,7 @@ package Command_Based_TeleOp_2024_08_17.Subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 ;import Command_Based_TeleOp_2024_08_17.Constants;
@@ -14,6 +15,7 @@ public class MecanumDriveBaseSubsystem extends SubsystemBase {
     private  final Motor frontRight;
     private  final Motor backLeft;
     private  final Motor backRight;
+    private final  BNO055IMU imu;
 
     public MecanumDriveBaseSubsystem(HardwareMap hMap){
         frontLeft = hMap.get(Motor.class, Constants.Motors.FL_tag);
@@ -28,6 +30,14 @@ public class MecanumDriveBaseSubsystem extends SubsystemBase {
 
         backLeft.setInverted(true);
         backRight.setInverted(true);
+
+        BNO055IMU.Parameters myIMUparameters;
+        myIMUparameters = new BNO055IMU.Parameters();
+        myIMUparameters.angleUnit = myIMUparameters.angleUnit.RADIANS;
+        myIMUparameters.calibrationDataFile = "BNO055IMUCalibration.json";
+
+        imu = hMap.get(BNO055IMU.class, Constants.Sensors.IMU_tag);
+        imu.initialize(myIMUparameters);
 
     }
     @Override
