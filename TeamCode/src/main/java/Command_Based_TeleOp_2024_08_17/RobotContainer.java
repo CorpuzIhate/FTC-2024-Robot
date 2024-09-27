@@ -54,12 +54,12 @@ public class RobotContainer extends CommandOpMode {
 
         //TODO move motor, sensor and IMU setups into their subsystem
         //TODO put constant tags into constants
-        frontLeft = new Motor(m_HardwareMap, "front_left");
-        frontRight = new Motor(m_HardwareMap, "front_right");
-        backLeft = new Motor(m_HardwareMap, "back_left");
-        backRight = new Motor(m_HardwareMap, "back_right");
+        frontLeft = new Motor(m_HardwareMap, Constants.Motors.FL_tag);
+        frontRight = new Motor(m_HardwareMap, Constants.Motors.FR_tag);
+        backLeft = new Motor(m_HardwareMap, Constants.Motors.BL_tag);
+        backRight = new Motor(m_HardwareMap, Constants.Motors.BR_tag);
 
-        ContinousVacuumServo = new CRServo(m_HardwareMap, "Vacuum_Servo");
+        ContinousVacuumServo = new CRServo(m_HardwareMap, Constants.Servos.VacuumTag);
 
         frontLeft.setRunMode(Motor.RunMode.RawPower);
         frontRight.setRunMode(Motor.RunMode.RawPower);
@@ -80,7 +80,7 @@ public class RobotContainer extends CommandOpMode {
 
         myIMUparameters.calibrationDataFile = "BNO055IMUCalibration.json";
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu = hardwareMap.get(BNO055IMU.class, Constants.Sensors.IMU_tag);
 
         imu.initialize(myIMUparameters);
 
