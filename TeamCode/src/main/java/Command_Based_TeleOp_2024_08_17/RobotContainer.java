@@ -24,8 +24,8 @@ public class RobotContainer extends CommandOpMode {
 
 
     private  MecanumDriveBaseSubsystem mecanumDriveBaseSub;
-    private final TelemetryManagerSubsystem telemetryManagerSub = new TelemetryManagerSubsystem();
-    private  final VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
+    private  TelemetryManagerSubsystem telemetryManagerSub;
+    private   VacuumSubsystem vacuumSubsystem;
 
     private BNO055IMU imu;
 
@@ -36,10 +36,7 @@ public class RobotContainer extends CommandOpMode {
 
 
 
-    ServoEx targetVacuumServo;
-    CRServo ContinousVacuumServo;
     HardwareMap m_HardwareMap;
-
     public GamepadEx driverOP;
 
     @Override
@@ -51,11 +48,12 @@ public class RobotContainer extends CommandOpMode {
 
 
         mecanumDriveBaseSub = new MecanumDriveBaseSubsystem(m_HardwareMap);
+        telemetryManagerSub = new TelemetryManagerSubsystem();
+        vacuumSubsystem = new VacuumSubsystem(m_HardwareMap);
 
         //TODO move motor, sensor and IMU setups into their subsystem
         //TODO put constant tags into constants
 
-        ContinousVacuumServo = new CRServo(m_HardwareMap, Constants.Servos.VacuumTag);
 
         driverOP = new GamepadEx(gamepad1);
 
@@ -76,9 +74,10 @@ public class RobotContainer extends CommandOpMode {
         telemetryManagerSub.setDefaultCommand(new PerpetualCommand(new TelemetryManagerCMD(telemetryManagerSub)));
 
 
+
         mecanumDriveBaseSub.setDefaultCommand(new TeleOpJoystickRobotCentricCMD(mecanumDriveBaseSub,
                 telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX));
-        vacuumSubsystem.setDefaultCommand(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo));
+        vacuumSubsystem.setDefaultCommand(new PowerVacuumCMD(vacuumSubsystem, 1));
 
 
     }
