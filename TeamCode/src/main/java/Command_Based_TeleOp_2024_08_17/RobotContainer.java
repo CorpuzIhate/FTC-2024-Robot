@@ -23,7 +23,7 @@ import Command_Based_TeleOp_2024_08_17.Subsystems.VacuumSubsystem;
 public class RobotContainer extends CommandOpMode {
 
 
-    private final MecanumDriveBaseSubsystem mecanumDriveBaseSub = new MecanumDriveBaseSubsystem();
+    private  MecanumDriveBaseSubsystem mecanumDriveBaseSub;
     private final TelemetryManagerSubsystem telemetryManagerSub = new TelemetryManagerSubsystem();
     private  final VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
 
@@ -34,10 +34,7 @@ public class RobotContainer extends CommandOpMode {
     double strafePwr;
     double rotationPwr;
 
-    Motor frontLeft;
-    Motor frontRight;
-    Motor backLeft;
-    Motor backRight;
+
 
     ServoEx targetVacuumServo;
     CRServo ContinousVacuumServo;
@@ -52,22 +49,14 @@ public class RobotContainer extends CommandOpMode {
         rotationPwr = -gamepad1.right_stick_x;
         m_HardwareMap = hardwareMap;
 
+
+        mecanumDriveBaseSub = new MecanumDriveBaseSubsystem(m_HardwareMap);
+
         //TODO move motor, sensor and IMU setups into their subsystem
         //TODO put constant tags into constants
-        frontLeft = new Motor(m_HardwareMap, Constants.Motors.FL_tag);
-        frontRight = new Motor(m_HardwareMap, Constants.Motors.FR_tag);
-        backLeft = new Motor(m_HardwareMap, Constants.Motors.BL_tag);
-        backRight = new Motor(m_HardwareMap, Constants.Motors.BR_tag);
 
         ContinousVacuumServo = new CRServo(m_HardwareMap, Constants.Servos.VacuumTag);
 
-        frontLeft.setRunMode(Motor.RunMode.RawPower);
-        frontRight.setRunMode(Motor.RunMode.RawPower);
-        backLeft.setRunMode(Motor.RunMode.RawPower);
-        backRight.setRunMode(Motor.RunMode.RawPower);
-
-        backLeft.setInverted(true);
-        backRight.setInverted(true);
         driverOP = new GamepadEx(gamepad1);
 
 
@@ -88,8 +77,7 @@ public class RobotContainer extends CommandOpMode {
 
 
         mecanumDriveBaseSub.setDefaultCommand(new TeleOpJoystickRobotCentricCMD(mecanumDriveBaseSub,
-                telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX,
-                frontLeft, frontRight, backLeft, backRight));
+                telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX));
         vacuumSubsystem.setDefaultCommand(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo));
 
 

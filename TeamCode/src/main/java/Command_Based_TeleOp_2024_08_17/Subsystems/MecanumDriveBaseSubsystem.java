@@ -2,26 +2,42 @@ package Command_Based_TeleOp_2024_08_17.Subsystems;
 
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
-;
+;import Command_Based_TeleOp_2024_08_17.Constants;
 
 
 public class MecanumDriveBaseSubsystem extends SubsystemBase {
 
+    private  final Motor frontLeft;
+    private  final Motor frontRight;
+    private  final Motor backLeft;
+    private  final Motor backRight;
 
+    public MecanumDriveBaseSubsystem(HardwareMap hMap){
+        frontLeft = hMap.get(Motor.class, Constants.Motors.FL_tag);
+        frontRight = hMap.get(Motor.class, Constants.Motors.FR_tag);
+        backLeft = hMap.get(Motor.class, Constants.Motors.BL_tag);
+        backRight = hMap.get(Motor.class, Constants.Motors.BR_tag);
 
+        frontLeft.setRunMode(Motor.RunMode.RawPower);
+        frontRight.setRunMode(Motor.RunMode.RawPower);
+        backLeft.setRunMode(Motor.RunMode.RawPower);
+        backRight.setRunMode(Motor.RunMode.RawPower);
 
-    public MecanumDriveBaseSubsystem(){
-
+        backLeft.setInverted(true);
+        backRight.setInverted(true);
 
     }
     @Override
     public void  periodic(){
 
     }
-    public double[] setMotorSpeeds(double forwardPower, double strafePower,
+    public void setMotorSpeeds(double forwardPower, double strafePower,
                                   double rotationPower){
-        double[] motorSpeeds = new double[4];
+
+
         forwardPower *= -1;
         strafePower *= -1;
         rotationPower *= -1;
@@ -52,12 +68,12 @@ public class MecanumDriveBaseSubsystem extends SubsystemBase {
             backLeftSpeed /= max;
             backRightSpeed /= max;
         }
-        motorSpeeds[0] = frontLeftSpeed;
-        motorSpeeds[1] = frontRightSpeed;
-        motorSpeeds[2] = backLeftSpeed;
-        motorSpeeds[3] = backRightSpeed;
+        frontLeft.set(frontLeftSpeed);
+        frontRight.set(frontRightSpeed);
+        backLeft.set(backLeftSpeed);
+        backRight.set(backRightSpeed);
 
-        return motorSpeeds;
+
 
     }
 
