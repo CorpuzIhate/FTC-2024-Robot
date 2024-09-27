@@ -41,6 +41,7 @@ public class RobotContainer extends CommandOpMode {
 
     ServoEx targetVacuumServo;
     CRServo ContinousVacuumServo;
+    HardwareMap m_HardwareMap;
 
     public GamepadEx driverOP;
 
@@ -49,15 +50,16 @@ public class RobotContainer extends CommandOpMode {
         fwdPwr = -gamepad1.left_stick_y;
         strafePwr = -gamepad1.left_stick_x;
         rotationPwr = -gamepad1.right_stick_x;
+        m_HardwareMap = hardwareMap;
 
         //TODO move motor, sensor and IMU setups into their subsystem
         //TODO put constant tags into constants
-        frontLeft = new Motor(hardwareMap, "front_left");
-        frontRight = new Motor(hardwareMap, "front_right");
-        backLeft = new Motor(hardwareMap, "back_left");
-        backRight = new Motor(hardwareMap, "back_right");
+        frontLeft = new Motor(m_HardwareMap, "front_left");
+        frontRight = new Motor(m_HardwareMap, "front_right");
+        backLeft = new Motor(m_HardwareMap, "back_left");
+        backRight = new Motor(m_HardwareMap, "back_right");
 
-        ContinousVacuumServo = new CRServo(hardwareMap, "Vacuum_Servo");
+        ContinousVacuumServo = new CRServo(m_HardwareMap, "Vacuum_Servo");
 
         frontLeft.setRunMode(Motor.RunMode.RawPower);
         frontRight.setRunMode(Motor.RunMode.RawPower);
