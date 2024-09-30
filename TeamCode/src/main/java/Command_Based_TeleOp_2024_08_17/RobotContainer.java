@@ -64,6 +64,8 @@ public class RobotContainer extends CommandOpMode {
         backLeft.setRunMode(Motor.RunMode.RawPower);
         backRight.setRunMode(Motor.RunMode.RawPower);
 
+        ContinousVacuumServo.setRunMode(Motor.RunMode.RawPower);
+
         backLeft.setInverted(true);
         backRight.setInverted(true);
         driverOP = new GamepadEx(gamepad1);
