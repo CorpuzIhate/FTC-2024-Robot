@@ -3,7 +3,10 @@ package Command_Based_TeleOp_2024_08_17;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.PerpetualCommand;
+import com.arcrobotics.ftclib.command.button.Button;
+import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
@@ -44,6 +47,8 @@ public class RobotContainer extends CommandOpMode {
 
     public GamepadEx driverOP;
 
+    private Button vacuumButton;
+
     @Override
     public void initialize() {
         fwdPwr = -gamepad1.left_stick_y;
@@ -66,7 +71,10 @@ public class RobotContainer extends CommandOpMode {
 
         backLeft.setInverted(true);
         backRight.setInverted(true);
+
         driverOP = new GamepadEx(gamepad1);
+        vacuumButton = new GamepadButton( driverOP, GamepadKeys.Button.A);
+
 
 
         BNO055IMU.Parameters myIMUparameters;
@@ -82,13 +90,14 @@ public class RobotContainer extends CommandOpMode {
 
         imu.initialize(myIMUparameters);
 
+
+
+
         telemetryManagerSub.setDefaultCommand(new PerpetualCommand(new TelemetryManagerCMD(telemetryManagerSub)));
-
-
         mecanumDriveBaseSub.setDefaultCommand(new TeleOpJoystickRobotCentricCMD(mecanumDriveBaseSub,
                 telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX,
                 frontLeft, frontRight, backLeft, backRight));
-        vacuumSubsystem.setDefaultCommand(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo));
+        vacuumButton.whenActive(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo));
 
 
     }
