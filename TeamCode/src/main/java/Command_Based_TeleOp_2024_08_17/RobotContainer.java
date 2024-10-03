@@ -2,6 +2,7 @@ package Command_Based_TeleOp_2024_08_17;
 
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.PerpetualCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
@@ -46,8 +47,9 @@ public class RobotContainer extends CommandOpMode {
     CRServo ContinousVacuumServo;
 
     public GamepadEx driverOP;
+    public Button vacuumButton;
 
-    private Button vacuumButton;
+
 
     @Override
     public void initialize() {
@@ -69,12 +71,12 @@ public class RobotContainer extends CommandOpMode {
         backLeft.setRunMode(Motor.RunMode.RawPower);
         backRight.setRunMode(Motor.RunMode.RawPower);
 
+        ContinousVacuumServo.setRunMode(Motor.RunMode.RawPower);
+
         backLeft.setInverted(true);
         backRight.setInverted(true);
-
         driverOP = new GamepadEx(gamepad1);
-        vacuumButton = new GamepadButton( driverOP, GamepadKeys.Button.A);
-
+        vacuumButton = new GamepadButton(driverOP, GamepadKeys.Button.A);
 
 
         BNO055IMU.Parameters myIMUparameters;
@@ -90,15 +92,15 @@ public class RobotContainer extends CommandOpMode {
 
         imu.initialize(myIMUparameters);
 
-
-
-
         telemetryManagerSub.setDefaultCommand(new PerpetualCommand(new TelemetryManagerCMD(telemetryManagerSub)));
+
+
         mecanumDriveBaseSub.setDefaultCommand(new TeleOpJoystickRobotCentricCMD(mecanumDriveBaseSub,
                 telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX,
                 frontLeft, frontRight, backLeft, backRight));
-        vacuumButton.whenActive(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo));
-
+        vacuumButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo)).whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
+//note we didn't use whileActiveContinuous because it would schedule and re-schedule
+        // the CMD creating a jittering effect on the servo
 
     }
 
