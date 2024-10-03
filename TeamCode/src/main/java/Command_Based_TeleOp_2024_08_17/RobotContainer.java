@@ -42,6 +42,7 @@ public class RobotContainer extends CommandOpMode {
     Motor frontRight;
     Motor backLeft;
     Motor backRight;
+    Motor shoulderMotor;
 
     ServoEx targetVacuumServo;
     CRServo ContinousVacuumServo;
@@ -63,6 +64,8 @@ public class RobotContainer extends CommandOpMode {
         frontRight = new Motor(hardwareMap, "front_right");
         backLeft = new Motor(hardwareMap, "back_left");
         backRight = new Motor(hardwareMap, "back_right");
+
+        shoulderMotor = new Motor(hardwareMap,"shoulder_motor");
 
         ContinousVacuumServo = new CRServo(hardwareMap, "Vacuum_Servo");
 
