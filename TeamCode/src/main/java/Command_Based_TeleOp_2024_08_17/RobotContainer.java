@@ -15,10 +15,12 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import Command_Based_TeleOp_2024_08_17.Commands.MoveShoulderCMD;
 import Command_Based_TeleOp_2024_08_17.Commands.PowerVacuumCMD;
 import Command_Based_TeleOp_2024_08_17.Commands.TeleOpJoystickRobotCentricCMD;
 import Command_Based_TeleOp_2024_08_17.Commands.TelemetryManagerCMD;
 import Command_Based_TeleOp_2024_08_17.Subsystems.MecanumDriveBaseSubsystem;
+import Command_Based_TeleOp_2024_08_17.Subsystems.ShoulderSubsystem;
 import Command_Based_TeleOp_2024_08_17.Subsystems.TelemetryManagerSubsystem;
 import Command_Based_TeleOp_2024_08_17.Subsystems.VacuumSubsystem;
 
@@ -30,7 +32,7 @@ public class RobotContainer extends CommandOpMode {
     private final MecanumDriveBaseSubsystem mecanumDriveBaseSub = new MecanumDriveBaseSubsystem();
     private final TelemetryManagerSubsystem telemetryManagerSub = new TelemetryManagerSubsystem();
     private  final VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
-
+    private final ShoulderSubsystem shoulderSub = new  ShoulderSubsystem();
     private BNO055IMU imu;
 
 
@@ -66,6 +68,7 @@ public class RobotContainer extends CommandOpMode {
         backRight = new Motor(hardwareMap, "back_right");
 
         shoulderMotor = new Motor(hardwareMap,"shoulder_motor");
+        shoulderMotor.setRunMode(Motor.RunMode.RawPower);
 
         ContinousVacuumServo = new CRServo(hardwareMap, "Vacuum_Servo");
 
@@ -101,9 +104,11 @@ public class RobotContainer extends CommandOpMode {
         mecanumDriveBaseSub.setDefaultCommand(new TeleOpJoystickRobotCentricCMD(mecanumDriveBaseSub,
                 telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX,
                 frontLeft, frontRight, backLeft, backRight));
+
+        shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, shoulderMotor,telemetryManagerSub.getTelemetryObject() ));
+
         vacuumButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo)).whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
-//note we didn't use whileActiveContinuous because it would schedule and re-schedule
-        // the CMD creating a jittering effect on the servo
+
 
     }
 
