@@ -18,7 +18,7 @@ public class MoveShoulderCMD extends CommandBase {
         m_shoulderMotor = shoulderMotor;
         addRequirements(m_shoulderSub);
     }
-
+//yolo
     @Override
     public void execute(){
         m_shoulderMotor.set(1);
