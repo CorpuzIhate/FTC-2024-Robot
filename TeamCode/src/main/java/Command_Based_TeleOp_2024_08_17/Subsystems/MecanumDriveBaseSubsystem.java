@@ -2,26 +2,30 @@ package Command_Based_TeleOp_2024_08_17.Subsystems;
 
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 
 ;
 
 
 public class MecanumDriveBaseSubsystem extends SubsystemBase {
+    private final Motor m_FL, m_FR, m_BR, m_BL;
 
 
 
-
-    public MecanumDriveBaseSubsystem(){
-
+    public MecanumDriveBaseSubsystem(Motor FL, Motor FR, Motor BR, Motor BL){
+        m_FL = FL;
+        m_FR = FR;
+        m_BL = BL;
+        m_BR = BR;
 
     }
     @Override
     public void  periodic(){
 
     }
-    public double[] setMotorSpeeds(double forwardPower, double strafePower,
+    public void setMotorSpeeds(double forwardPower, double strafePower,
                                   double rotationPower){
-        double[] motorSpeeds = new double[4];
+
         forwardPower *= -1;
         strafePower *= -1;
         rotationPower *= -1;
@@ -52,12 +56,11 @@ public class MecanumDriveBaseSubsystem extends SubsystemBase {
             backLeftSpeed /= max;
             backRightSpeed /= max;
         }
-        motorSpeeds[0] = frontLeftSpeed;
-        motorSpeeds[1] = frontRightSpeed;
-        motorSpeeds[2] = backLeftSpeed;
-        motorSpeeds[3] = backRightSpeed;
+        m_FL.set(frontLeftSpeed);
+        m_FR.set(frontRightSpeed);
+        m_BR.set(backRightSpeed);
+        m_BL.set(backLeftSpeed);
 
-        return motorSpeeds;
 
     }
 

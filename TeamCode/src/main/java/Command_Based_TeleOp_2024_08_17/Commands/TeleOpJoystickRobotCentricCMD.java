@@ -25,12 +25,11 @@ public class TeleOpJoystickRobotCentricCMD extends CommandBase {
     double backLeftSpeed;
     double backRightSpeed;
 
-    Motor m_FL,m_FR,m_BL,m_BR;
+
 
     public TeleOpJoystickRobotCentricCMD(MecanumDriveBaseSubsystem mecanumDriveBaseSubsystem,
                                          Telemetry dashboardTelemetry, DoubleSupplier forwardPower,
-                                         DoubleSupplier strafePower, DoubleSupplier rotationPower,
-                                         Motor FL, Motor FR, Motor BL, Motor BR
+                                         DoubleSupplier strafePower, DoubleSupplier rotationPower
     ) {
         m_dashboardTelemetry = dashboardTelemetry;
         m_MecanumSub = mecanumDriveBaseSubsystem;
@@ -39,10 +38,7 @@ public class TeleOpJoystickRobotCentricCMD extends CommandBase {
         m_strafePower = strafePower;
         m_rotationPower = rotationPower;
 
-        m_FL = FL;
-        m_FR = FR;
-        m_BL = BL;
-        m_BR = BR;
+
 
 
         addRequirements(mecanumDriveBaseSubsystem);
@@ -50,14 +46,8 @@ public class TeleOpJoystickRobotCentricCMD extends CommandBase {
     @Override
     public  void execute(){
         double[] motorSpeeds = new double[4];
-        motorSpeeds = m_MecanumSub.setMotorSpeeds(m_forwardPower.getAsDouble(),
-                m_strafePower.getAsDouble(),m_rotationPower.getAsDouble());
-
-        m_FL.set(motorSpeeds[0]);
-        m_FR.set(motorSpeeds[1]);
-        m_BL.set(motorSpeeds[2]);
-        m_BR.set(motorSpeeds[3]);
-
+        m_MecanumSub.setMotorSpeeds(m_forwardPower.getAsDouble(), m_strafePower.getAsDouble(),
+                m_rotationPower.getAsDouble());
 
         m_dashboardTelemetry.addData("m_forwardPower (COMMAND)", m_forwardPower);
         m_dashboardTelemetry.addData("m_strafePower (COMMAND)", m_strafePower);

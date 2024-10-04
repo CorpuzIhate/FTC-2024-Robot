@@ -29,10 +29,6 @@ import Command_Based_TeleOp_2024_08_17.Subsystems.VacuumSubsystem;
 public class RobotContainer extends CommandOpMode {
 
 
-    private final MecanumDriveBaseSubsystem mecanumDriveBaseSub = new MecanumDriveBaseSubsystem();
-    private final TelemetryManagerSubsystem telemetryManagerSub = new TelemetryManagerSubsystem();
-    private  final VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
-    private final ShoulderSubsystem shoulderSub = new  ShoulderSubsystem();
     private BNO055IMU imu;
 
 
@@ -48,6 +44,12 @@ public class RobotContainer extends CommandOpMode {
 
     ServoEx targetVacuumServo;
     CRServo ContinousVacuumServo;
+
+    private MecanumDriveBaseSubsystem mecanumDriveBaseSub;
+
+    private TelemetryManagerSubsystem telemetryManagerSub = new TelemetryManagerSubsystem();
+    private  VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
+    private ShoulderSubsystem shoulderSub = new ShoulderSubsystem();
 
     public GamepadEx driverOP;
     public Button vacuumButton;
@@ -85,6 +87,7 @@ public class RobotContainer extends CommandOpMode {
         vacuumButton = new GamepadButton(driverOP, GamepadKeys.Button.A);
 
 
+
         BNO055IMU.Parameters myIMUparameters;
 
         myIMUparameters = new BNO055IMU.Parameters();
@@ -97,17 +100,25 @@ public class RobotContainer extends CommandOpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(myIMUparameters);
 
+        initSubsystems();
+        runCommands();
+
+
+    }
+    private void initSubsystems(){
+        mecanumDriveBaseSub = new MecanumDriveBaseSubsystem(
+                frontLeft, frontRight, backLeft, backRight);
+
+    }
+    private void runCommands(){
         telemetryManagerSub.setDefaultCommand(new PerpetualCommand(new TelemetryManagerCMD(telemetryManagerSub)));
 
-
         mecanumDriveBaseSub.setDefaultCommand(new TeleOpJoystickRobotCentricCMD(mecanumDriveBaseSub,
-                telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX,
-                frontLeft, frontRight, backLeft, backRight));
+                telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX));
 
         shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, shoulderMotor,telemetryManagerSub.getTelemetryObject() ));
 
         vacuumButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo)).whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
-
 
     }
 
