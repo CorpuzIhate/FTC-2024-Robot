@@ -13,7 +13,7 @@ import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+
 
 import Command_Based_TeleOp_2024_08_17.Commands.MoveShoulderCMD;
 import Command_Based_TeleOp_2024_08_17.Commands.PowerVacuumCMD;
@@ -95,7 +95,6 @@ public class RobotContainer extends CommandOpMode {
         myIMUparameters.calibrationDataFile = "BNO055IMUCalibration.json";
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
-
         imu.initialize(myIMUparameters);
 
         telemetryManagerSub.setDefaultCommand(new PerpetualCommand(new TelemetryManagerCMD(telemetryManagerSub)));

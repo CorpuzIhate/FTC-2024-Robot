@@ -21,7 +21,7 @@ public class MoveShoulderCMD extends CommandBase {
 //yolo
     @Override
     public void execute(){
-        m_shoulderMotor.set(1);
+        //m_shoulderMotor.set(1);
     }
 
 
