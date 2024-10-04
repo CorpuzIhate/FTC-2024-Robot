@@ -11,11 +11,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class PidShoulderTest extends OpMode {
     public static double currentSetpoint;
+//TODO tune coefficients.
     public static double kP = 1;
     public static double kI = 0;
     public static double kD = 1;
     public static double kF = 1;
     PIDFController feedforward;
+    ArmFeedforward test;
 
     double output;
 
@@ -28,10 +30,15 @@ public class PidShoulderTest extends OpMode {
         feedforward = new PIDFController(kP, kI, kD, kF);
 
         shoulderMotor = new Motor(hardwareMap,"shoulder_motor");
-        shoulderMotor.setRunMode(Motor.RunMode.VelocityControl);
+        shoulderMotor.setRunMode(Motor.RunMode.RawPower);
     }
     public void loop(){
         output = feedforward.calculate(shoulderMotor.getCurrentPosition(), currentSetpoint);
+
+        if(feedforward.atSetPoint()){
+            output = 0;
+        }
+        shoulderMotor.set(output);
 
     }
 
