@@ -47,7 +47,7 @@ public class RobotContainer extends CommandOpMode {
 
     private MecanumDriveBaseSubsystem mecanumDriveBaseSub;
 
-    private TelemetryManagerSubsystem telemetryManagerSub = new TelemetryManagerSubsystem();
+    private TelemetryManagerSubsystem telemetryManagerSub;
     private  VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
     private ShoulderSubsystem shoulderSub = new ShoulderSubsystem();
 
@@ -108,6 +108,8 @@ public class RobotContainer extends CommandOpMode {
     private void initSubsystems(){
         mecanumDriveBaseSub = new MecanumDriveBaseSubsystem(
                 frontLeft, frontRight, backLeft, backRight);
+        telemetryManagerSub = new TelemetryManagerSubsystem();
+
 
     }
     private void runCommands(){
