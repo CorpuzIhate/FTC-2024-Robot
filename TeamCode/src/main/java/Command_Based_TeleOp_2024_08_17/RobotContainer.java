@@ -2,7 +2,6 @@ package Command_Based_TeleOp_2024_08_17;
 
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.PerpetualCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
@@ -14,9 +13,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import Command_Based_TeleOp_2024_08_17.Commands.MoveShoulderCMD;
 import Command_Based_TeleOp_2024_08_17.Commands.PowerVacuumCMD;
 import Command_Based_TeleOp_2024_08_17.Commands.TeleOpJoystickRobotCentricCMD;
 import Command_Based_TeleOp_2024_08_17.Commands.TelemetryManagerCMD;
@@ -53,7 +50,8 @@ public class RobotContainer extends CommandOpMode {
     CRServo ContinousVacuumServo;
 
     public GamepadEx driverOP;
-    public Button vacuumButton;
+    public Button vacuumIntakeButton;
+    public Button vacuumOutakeButton;
 
     public SparkFunOTOS Otos;
 
@@ -76,6 +74,7 @@ public class RobotContainer extends CommandOpMode {
 
         ContinousVacuumServo = new CRServo(hardwareMap, "Vacuum_Servo");
 
+
         frontLeft.setRunMode(Motor.RunMode.RawPower);
         frontRight.setRunMode(Motor.RunMode.RawPower);
         backLeft.setRunMode(Motor.RunMode.RawPower);
@@ -86,7 +85,8 @@ public class RobotContainer extends CommandOpMode {
         backLeft.setInverted(true);
         backRight.setInverted(true);
         driverOP = new GamepadEx(gamepad1);
-        vacuumButton = new GamepadButton(driverOP, GamepadKeys.Button.A);
+        vacuumIntakeButton = new GamepadButton(driverOP, GamepadKeys.Button.A);
+        vacuumOutakeButton = new GamepadButton(driverOP, GamepadKeys.Button.B);
 
 
         BNO055IMU.Parameters myIMUparameters;
@@ -114,8 +114,10 @@ public class RobotContainer extends CommandOpMode {
 
         //shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, shoulderMotor,telemetryManagerSub.getTelemetryObject() ));
 
-        vacuumButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo)).whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
-
+        vacuumIntakeButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, -1,ContinousVacuumServo))
+                .whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
+        vacuumOutakeButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo))
+                .whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
 
     }
 
@@ -126,7 +128,7 @@ public class RobotContainer extends CommandOpMode {
         // persisted in the sensor, so you need to set at the start of all your
         // OpModes if using the non-default value.
         // myOtos.setLinearUnit(DistanceUnit.METER);
-        Otos.setLinearUnit(DistanceUnit.INCH);
+        Otos.setLinearUnit(DistanceUnit.METER);
         // myOtos.setAngularUnit(AnguleUnit.RADIANS);
         Otos.setAngularUnit(AngleUnit.DEGREES);
 
@@ -161,7 +163,7 @@ public class RobotContainer extends CommandOpMode {
         // inverse of the error. For example, if you move the robot 100 inches and
         // the sensor reports 103 inches, set the linear scalar to 100/103 = 0.971
         Otos.setLinearScalar(1.0);
-        Otos.setAngularScalar(1.0);
+        Otos.setAngularScalar(0.9);
 
         // The IMU on the OTOS includes a gyroscope and accelerometer, which could
         // have an offset. Note that as of firmware version 1.0, the calibration
