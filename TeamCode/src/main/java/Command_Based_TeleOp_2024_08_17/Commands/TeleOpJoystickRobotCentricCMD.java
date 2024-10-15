@@ -18,7 +18,6 @@ public class TeleOpJoystickRobotCentricCMD extends CommandBase {
     private DoubleSupplier m_forwardPower;
     private DoubleSupplier m_strafePower;
     private DoubleSupplier m_rotationPower;
-// weeee are
 
 
     double frontLeftSpeed;
@@ -59,8 +58,6 @@ public class TeleOpJoystickRobotCentricCMD extends CommandBase {
         m_BL.set(motorSpeeds[2]);
         m_BR.set(motorSpeeds[3]);
 
-
-        m_dashboardTelemetry.addData("hello urmom", m_MecanumSub.urmom);
 
         m_dashboardTelemetry.addData("m_forwardPower (COMMAND)", m_forwardPower);
         m_dashboardTelemetry.addData("m_strafePower (COMMAND)", m_strafePower);
