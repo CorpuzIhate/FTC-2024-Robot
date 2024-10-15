@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @TeleOp
 public class PidShoulderTest extends OpMode {
     public static double currentSetpoint;
-//TODO tune coefficients.
+
     public static double kP = 0.6;
     public static double kI = 0;
     public static double kD = 0.015;

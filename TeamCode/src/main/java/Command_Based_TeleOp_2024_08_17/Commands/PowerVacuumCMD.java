@@ -30,7 +30,6 @@ public class PowerVacuumCMD extends CommandBase {
     }
     @Override
     public boolean isFinished() {
-        m_ContinousVacuumServo.set(0);
         return false;
     }
 };

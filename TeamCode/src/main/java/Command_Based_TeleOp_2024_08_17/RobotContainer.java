@@ -46,10 +46,11 @@ public class RobotContainer extends CommandOpMode {
     CRServo ContinousVacuumServo;
 
     private MecanumDriveBaseSubsystem mecanumDriveBaseSub;
-
     private TelemetryManagerSubsystem telemetryManagerSub;
+    //TODO refactor Vacuum servos so that they're accessed through the Vacuum sub
+
     private  VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
-    private ShoulderSubsystem shoulderSub = new ShoulderSubsystem();
+    private ShoulderSubsystem shoulderSub;
 
     public GamepadEx driverOP;
     public Button vacuumButton;
@@ -62,7 +63,7 @@ public class RobotContainer extends CommandOpMode {
         strafePwr = -gamepad1.left_stick_x;
         rotationPwr = -gamepad1.right_stick_x;
 
-        //TODO move motor, sensor and IMU setups into their subsystem
+        //TODO sensor and IMU setups into their subsystem
         //TODO put constant tags into constants
         frontLeft = new Motor(hardwareMap, "front_left");
         frontRight = new Motor(hardwareMap, "front_right");
@@ -109,6 +110,7 @@ public class RobotContainer extends CommandOpMode {
         mecanumDriveBaseSub = new MecanumDriveBaseSubsystem(
                 frontLeft, frontRight, backLeft, backRight);
         telemetryManagerSub = new TelemetryManagerSubsystem();
+        shoulderSub = new ShoulderSubsystem(shoulderMotor);
 
 
     }
@@ -118,7 +120,7 @@ public class RobotContainer extends CommandOpMode {
         mecanumDriveBaseSub.setDefaultCommand(new TeleOpJoystickRobotCentricCMD(mecanumDriveBaseSub,
                 telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX));
 
-        shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, shoulderMotor,telemetryManagerSub.getTelemetryObject() ));
+        shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, telemetryManagerSub.getTelemetryObject(),1000 ));
 
         vacuumButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo)).whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
 
