@@ -49,18 +49,16 @@ public class MoveShoulderCMD extends CommandBase {
 
         m_dashboardTelemetry.update();
         if(feedforward.atSetPoint()){
-            shoulderisAtpoint = true;
+
             m_dashboardTelemetry.addData("atPoint","yes");
-            shoulderMotor.stopMotor();
-            isFinished();
 
 
         }
-        if(!shoulderisAtpoint){
+
             shoulderMotor.set(output); // error might happen here cuz
             // we just pass the shoulderMotor object through the subsystem
 
-        }
+
     }
 
     @Override

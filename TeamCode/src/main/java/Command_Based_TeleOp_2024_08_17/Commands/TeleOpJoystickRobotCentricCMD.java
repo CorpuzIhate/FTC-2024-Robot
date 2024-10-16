@@ -53,9 +53,6 @@ public class TeleOpJoystickRobotCentricCMD extends CommandBase {
         m_dashboardTelemetry.addData("m_strafePower (COMMAND)", m_strafePower);
         m_dashboardTelemetry.addData("m_rotationPower (COMMAND)", m_rotationPower);
 
-
-
-
     }
     @Override
     public boolean isFinished(){
