@@ -12,10 +12,10 @@ public class ShoulderSubsystem extends SubsystemBase {
     public ShoulderSubsystem(Motor shoulder_Motor){
         m_ShoulderMotor = shoulder_Motor;
         m_ShoulderfeedForward = new PIDFController(
-                Constants.ShoulderPIDConstants.kP,
-                Constants.ShoulderPIDConstants.kI,
-                Constants.ShoulderPIDConstants.kD,
-                Constants.ShoulderPIDConstants.kF);
+                Constants.kP,
+                Constants.kI,
+                Constants.kD,
+                Constants.kF);
 
     }
     public Motor getShoulderMotor(){

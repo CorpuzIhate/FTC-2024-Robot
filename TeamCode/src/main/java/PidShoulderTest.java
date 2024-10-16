@@ -50,13 +50,12 @@ public class PidShoulderTest extends OpMode {
         if(feedforward.atSetPoint()){
             shoulderisAtpoint = true;
             dashboardTelemetry.addData("atPoint","yes");
-            shoulderMotor.stopMotor();
 
 
         }
-        if(!shoulderisAtpoint){
+
             shoulderMotor.set(output);
-        }
+
 
 
     }

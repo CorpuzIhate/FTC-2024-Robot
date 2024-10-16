@@ -35,36 +35,36 @@ public class MoveShoulderCMD extends CommandBase {
         shoulderMotor.resetEncoder();
         shoulderMotor.setRunMode(Motor.RunMode.RawPower);
 
-        m_dashboardTelemetry.addData("kP", Constants.ShoulderPIDConstants.kP);
-        m_dashboardTelemetry.addData("kI",Constants.ShoulderPIDConstants.kI);
-        m_dashboardTelemetry.addData("kD",Constants.ShoulderPIDConstants.kD);
-        m_dashboardTelemetry.addData("kF",Constants.ShoulderPIDConstants.kF);
+        m_dashboardTelemetry.addData("kP", Constants.kP);
+        m_dashboardTelemetry.addData("kI",Constants.kI);
+        m_dashboardTelemetry.addData("kD",Constants.kD);
+        m_dashboardTelemetry.addData("kF",Constants.kF);
         m_dashboardTelemetry.addData("position",shoulderMotor.getCurrentPosition());
         m_dashboardTelemetry.update();
 
     }
     @Override
     public void execute(){
-        output = feedforward.calculate(shoulderMotor.getCurrentPosition(), m_currentSetpoint);
-
+        output = feedforward.calculate(shoulderMotor.getCurrentPosition(), 1000);
+        m_dashboardTelemetry.addData("setpoint", 1000);
+        m_dashboardTelemetry.addData("position",shoulderMotor.getCurrentPosition());
         m_dashboardTelemetry.update();
         if(feedforward.atSetPoint()){
             shoulderisAtpoint = true;
             m_dashboardTelemetry.addData("atPoint","yes");
-            shoulderMotor.stopMotor();
-            isFinished();
+
+
 
 
         }
+        shoulderMotor.set(output); // error might happen here cuz
+        // we just pass the shoulderMotor object through the subsystem
         if(!shoulderisAtpoint){
-            shoulderMotor.set(output); // error might happen here cuz
-            // we just pass the shoulderMotor object through the subsystem
+
+            m_dashboardTelemetry.addData("atPoint","no");
 
         }
     }
 
-    @Override
-    public boolean isFinished() {
-        return true;
-    }
+
 }

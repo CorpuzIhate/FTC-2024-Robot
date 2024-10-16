@@ -2,7 +2,6 @@ package Command_Based_TeleOp_2024_08_17;
 
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.PerpetualCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
@@ -53,7 +52,8 @@ public class RobotContainer extends CommandOpMode {
     private ShoulderSubsystem shoulderSub;
 
     public GamepadEx driverOP;
-    public Button vacuumButton;
+    public Button intakeVacuumButton;
+    public Button outakeVacuumButton;
 
 
 
@@ -85,7 +85,8 @@ public class RobotContainer extends CommandOpMode {
         backLeft.setInverted(true);
         backRight.setInverted(true);
         driverOP = new GamepadEx(gamepad1);
-        vacuumButton = new GamepadButton(driverOP, GamepadKeys.Button.A);
+        intakeVacuumButton = new GamepadButton(driverOP, GamepadKeys.Button.A);
+        outakeVacuumButton = new GamepadButton(driverOP, GamepadKeys.Button.B);
 
 
 
@@ -120,10 +121,10 @@ public class RobotContainer extends CommandOpMode {
         mecanumDriveBaseSub.setDefaultCommand(new TeleOpJoystickRobotCentricCMD(mecanumDriveBaseSub,
                 telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX));
 
-        shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, telemetryManagerSub.getTelemetryObject(),1000 ));
+        shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, telemetryManagerSub.getTelemetryObject(),Constants.setpoint ));
 
-        vacuumButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo)).whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
-
+        intakeVacuumButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, -1,ContinousVacuumServo)).whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
+        outakeVacuumButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo)).whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
     }
 
 

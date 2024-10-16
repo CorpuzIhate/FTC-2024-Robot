@@ -1,16 +1,17 @@
 package Command_Based_TeleOp_2024_08_17;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @Config
-public final class Constants{
-    public static final class ShoulderPIDConstants{
-        public static final double kP = 0.6;
-        public static final double kI = 0;
-        public static final double kD = 0.015;
-        public static final double kF = 0;
+@TeleOp
+public class Constants{
+    public static double setpoint;
+    public static  double kP = 0.17;
+    public static  double kI = 0;
+    public static  double kD = 0;
+    public static  double kF = 0;
 
-    }
 
 
 
