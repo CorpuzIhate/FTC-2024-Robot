@@ -52,7 +52,8 @@ public class RobotContainer extends CommandOpMode {
 
     public SparkFunOTOS Otos;
 
-    private final MecanumDriveBaseSubsystem mecanumDriveBaseSub = new MecanumDriveBaseSubsystem();
+    private MecanumDriveBaseSubsystem mecanumDriveBaseSub;
+
     private final TelemetryManagerSubsystem telemetryManagerSub = new TelemetryManagerSubsystem();
     private  final VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
     private final ShoulderSubsystem shoulderSub = new  ShoulderSubsystem(shoulderMotor);
@@ -69,6 +70,9 @@ public class RobotContainer extends CommandOpMode {
         frontRight = new Motor(hardwareMap, "front_right");
         backLeft = new Motor(hardwareMap, "back_left");
         backRight = new Motor(hardwareMap, "back_right");
+
+        mecanumDriveBaseSub = new MecanumDriveBaseSubsystem(frontLeft, frontRight
+                ,backRight, backLeft);
 
         shoulderMotor = new Motor(hardwareMap,"shoulder_motor");
         shoulderMotor.setRunMode(Motor.RunMode.RawPower);
@@ -113,11 +117,11 @@ public class RobotContainer extends CommandOpMode {
                 telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX));
 
         //shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, shoulderMotor,telemetryManagerSub.getTelemetryObject() ));
-
-        vacuumIntakeButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, -1,ContinousVacuumServo))
-                .whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
-        vacuumOutakeButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo))
-                .whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
+//
+//        vacuumIntakeButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, -1,ContinousVacuumServo))
+//                .whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
+//        vacuumOutakeButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo))
+//                .whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
 
     }
 
