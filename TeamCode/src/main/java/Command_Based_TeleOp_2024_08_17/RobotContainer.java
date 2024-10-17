@@ -29,10 +29,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class RobotContainer extends CommandOpMode {
 
 
-    private final MecanumDriveBaseSubsystem mecanumDriveBaseSub = new MecanumDriveBaseSubsystem();
-    private final TelemetryManagerSubsystem telemetryManagerSub = new TelemetryManagerSubsystem();
-    private  final VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
-    private final ShoulderSubsystem shoulderSub = new  ShoulderSubsystem();
+
     private BNO055IMU imu;
 
 
@@ -55,6 +52,10 @@ public class RobotContainer extends CommandOpMode {
 
     public SparkFunOTOS Otos;
 
+    private final MecanumDriveBaseSubsystem mecanumDriveBaseSub = new MecanumDriveBaseSubsystem();
+    private final TelemetryManagerSubsystem telemetryManagerSub = new TelemetryManagerSubsystem();
+    private  final VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
+    private final ShoulderSubsystem shoulderSub = new  ShoulderSubsystem(shoulderMotor);
 
     @Override
     public void initialize() {
@@ -109,8 +110,7 @@ public class RobotContainer extends CommandOpMode {
 
 
         mecanumDriveBaseSub.setDefaultCommand(new TeleOpJoystickRobotCentricCMD(mecanumDriveBaseSub,
-                telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX,
-                frontLeft, frontRight, backLeft, backRight));
+                telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX));
 
         //shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, shoulderMotor,telemetryManagerSub.getTelemetryObject() ));
 
