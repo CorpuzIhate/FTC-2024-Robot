@@ -68,7 +68,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  */
 
 @Autonomous(name="Robot: Auto Drive By Encoder", group="Robot")
-@Disabled
+
 public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -146,11 +146,11 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
         encoderDrive(DRIVE_SPEED,  12,  12, 5);
-        encoderDrive(TURN_SPEED,   48, -48, 5);
-        encoderDrive(TURN_SPEED,   -24, 24, 5);
+        encoderDrive(TURN_SPEED,   78, -78, 5);
+        encoderDrive(TURN_SPEED,   -22, 22, 5);
         encoderDrive(DRIVE_SPEED,  12,  12, 5);
         encoderDrive(TURN_SPEED,   24, -24, 5);
-        encoderDrive(DRIVE_SPEED,  12,  12, 5);
+        encoderDrive(DRIVE_SPEED,  -12,  -12, 5);
 //        encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 
         dashboardTelemetry.addData("Path", "Complete");
