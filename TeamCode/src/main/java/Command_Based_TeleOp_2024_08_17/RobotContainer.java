@@ -128,7 +128,7 @@ public class RobotContainer extends CommandOpMode {
         // persisted in the sensor, so you need to set at the start of all your
         // OpModes if using the non-default value.
         // myOtos.setLinearUnit(DistanceUnit.METER);
-        Otos.setLinearUnit(DistanceUnit.METER);
+        Otos.setLinearUnit(DistanceUnit.INCH);
         // myOtos.setAngularUnit(AnguleUnit.RADIANS);
         Otos.setAngularUnit(AngleUnit.DEGREES);
 
@@ -162,7 +162,7 @@ public class RobotContainer extends CommandOpMode {
         // multiple speeds to get an average, then set the linear scalar to the
         // inverse of the error. For example, if you move the robot 100 inches and
         // the sensor reports 103 inches, set the linear scalar to 100/103 = 0.971
-        Otos.setLinearScalar(1.0);
+        Otos.setLinearScalar(15.8);
         Otos.setAngularScalar(0.9);
 
         // The IMU on the OTOS includes a gyroscope and accelerometer, which could

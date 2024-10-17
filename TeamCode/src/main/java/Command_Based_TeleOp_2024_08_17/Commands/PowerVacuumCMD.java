@@ -30,7 +30,6 @@ public class PowerVacuumCMD extends CommandBase {
     }
     @Override
     public boolean isFinished() {
-
         return false;
     }
 };
