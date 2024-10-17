@@ -13,9 +13,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class PidShoulderTest extends OpMode {
     public static double currentSetpoint;
 
-    public static double kP = 0.6;
+    public static double kP = 0.17;
     public static double kI = 0;
-    public static double kD = 0.015;
+    public static double kD = 0.;
     public static double kF = 0;
     PIDFController feedforward;
 
