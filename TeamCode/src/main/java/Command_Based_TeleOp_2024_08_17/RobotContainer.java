@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.PerpetualCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
+import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.ServoEx;
@@ -54,6 +55,10 @@ public class RobotContainer extends CommandOpMode {
 
     public GamepadEx driverOP;
     public Button vacuumButton;
+    public GamepadButton moveShouldertoBottomPos;
+    public GamepadButton moveShouldertoMiddlePos;
+
+    public GamepadButton moveShouldertoUpperPos;
 
 
 
@@ -86,6 +91,9 @@ public class RobotContainer extends CommandOpMode {
         backRight.setInverted(true);
         driverOP = new GamepadEx(gamepad1);
         vacuumButton = new GamepadButton(driverOP, GamepadKeys.Button.A);
+        moveShouldertoBottomPos = new GamepadButton(driverOP, GamepadKeys.Button.X);
+        moveShouldertoMiddlePos = new GamepadButton(driverOP, GamepadKeys.Button.Y);
+        moveShouldertoUpperPos = new GamepadButton(driverOP, GamepadKeys.Button.DPAD_DOWN);
 
 
 
@@ -120,7 +128,7 @@ public class RobotContainer extends CommandOpMode {
         mecanumDriveBaseSub.setDefaultCommand(new TeleOpJoystickRobotCentricCMD(mecanumDriveBaseSub,
                 telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX));
 
-        shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, telemetryManagerSub.getTelemetryObject(),1000 ));
+        shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, telemetryManagerSub.getTelemetryObject(),moveShouldertoBottomPos, moveShouldertoMiddlePos, moveShouldertoUpperPos));
 
         vacuumButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo)).whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
 

@@ -1,6 +1,8 @@
 package Command_Based_TeleOp_2024_08_17.Commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.button.Button;
+import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 
@@ -12,18 +14,24 @@ import Command_Based_TeleOp_2024_08_17.Subsystems.ShoulderSubsystem;
 public class MoveShoulderCMD extends CommandBase {
     private final ShoulderSubsystem m_shoulderSub;
     private final Telemetry m_dashboardTelemetry;
-    private final double m_currentSetpoint;
+    private final GamepadButton m_moveShouldertoBottomPos;
+    private final GamepadButton m_moveShouldertoMiddlePos;
+    private final GamepadButton m_moveShouldertoUpperPos;
 
     private  Motor shoulderMotor;
     private  PIDFController feedforward;
     private  double output;
     private boolean shoulderisAtpoint;
+    private double currentSetpoint = 0;
 
-    public MoveShoulderCMD(ShoulderSubsystem shoulderSub, Telemetry dashboardTelemetry,
-                           double currentSetpoint){
+    public MoveShoulderCMD(ShoulderSubsystem shoulderSub, Telemetry dashboardTelemetry, GamepadButton moveShouldertoBottomPos
+    ,GamepadButton moveShouldertoMiddlePos,GamepadButton moveShouldertoUpperPos ) {
         m_shoulderSub = shoulderSub;
         m_dashboardTelemetry = dashboardTelemetry;
-        m_currentSetpoint = currentSetpoint;
+        m_moveShouldertoBottomPos = moveShouldertoBottomPos;
+        m_moveShouldertoMiddlePos = moveShouldertoMiddlePos;
+        m_moveShouldertoUpperPos = moveShouldertoUpperPos;
+
         addRequirements(m_shoulderSub);
     }
 
@@ -45,7 +53,22 @@ public class MoveShoulderCMD extends CommandBase {
     }
     @Override
     public void execute(){
-        output = feedforward.calculate(shoulderMotor.getCurrentPosition(), m_currentSetpoint);
+        if(m_moveShouldertoUpperPos.get()){
+            currentSetpoint = Constants.ShoulderSetpoints.upperArmPos;;
+
+        }
+        if(m_moveShouldertoMiddlePos.get()){
+            currentSetpoint = Constants.ShoulderSetpoints.middleArmPos;
+
+        }
+        if(m_moveShouldertoBottomPos.get()){
+            currentSetpoint = 0;
+
+        }
+
+        m_dashboardTelemetry.addData("position",shoulderMotor.getCurrentPosition());
+        m_dashboardTelemetry.addData("setpoint",currentSetpoint);
+        output = feedforward.calculate(shoulderMotor.getCurrentPosition(), currentSetpoint);
 
         m_dashboardTelemetry.update();
         if(feedforward.atSetPoint()){
@@ -63,6 +86,7 @@ public class MoveShoulderCMD extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return true;
+        return false;
+
     }
 }
