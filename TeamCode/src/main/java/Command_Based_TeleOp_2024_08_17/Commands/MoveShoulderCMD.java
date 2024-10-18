@@ -49,7 +49,7 @@ public class MoveShoulderCMD extends CommandBase {
         m_dashboardTelemetry.addData("kF",Constants.ShoulderPIDConstants.kF);
         m_dashboardTelemetry.addData("position",shoulderMotor.getCurrentPosition());
         m_dashboardTelemetry.update();
-
+//hi
     }
     @Override
     public void execute(){
