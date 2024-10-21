@@ -143,7 +143,7 @@ public class RobotContainer extends CommandOpMode {
         // clockwise (negative rotation) from the robot's orientation, the offset
         // would be {-5, 10, -90}. These can be any value, even the angle can be
         // tweaked slightly to compensate for imperfect mounting (eg. 1.3 degrees).
-        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(-4.17, 4.91, 0);
+        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0, 0, 0);
         Otos.setOffset(offset);
 
         // Here we can set the linear and angular scalars, which can compensate for
@@ -162,7 +162,7 @@ public class RobotContainer extends CommandOpMode {
         // multiple speeds to get an average, then set the linear scalar to the
         // inverse of the error. For example, if you move the robot 100 inches and
         // the sensor reports 103 inches, set the linear scalar to 100/103 = 0.971
-        Otos.setLinearScalar(15.8);
+        Otos.setLinearScalar(0.9);
         Otos.setAngularScalar(0.9);
 
         // The IMU on the OTOS includes a gyroscope and accelerometer, which could
