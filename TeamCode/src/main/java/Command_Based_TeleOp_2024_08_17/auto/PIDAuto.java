@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -12,14 +13,20 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Config
+@Autonomous
 public class PIDAuto extends LinearOpMode {
-    public static double kP = 0;
-    public static double kI= 0;
-    public static double kD = 0;
-    public static double kF = 0;
+    public static double KMoveP = 0.1;
+    public static double KMoveI = 0;
+    public static double KMoveD = 0;
+    public static double KMoveF = 0;
 
+    public static double KTurnP = 0.1;
+    public static double KTurnI = 0;
+    public static double KTurnD = 0;
+    public static double KTurnF = 0;
     private  PIDFController xPosController;
     private  PIDFController yPosController;
+    private  PIDFController hPosController;
 
     private DcMotor frontLeft = null;
     private DcMotor frontRight = null;
@@ -50,17 +57,18 @@ public class PIDAuto extends LinearOpMode {
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        dashboardTelemetry.addData("p",kP);
-        dashboardTelemetry.addData("I",kI);
-        dashboardTelemetry.addData("D",kD);
-        dashboardTelemetry.addData("F",kF);
+        dashboardTelemetry.addData("p", KMoveP);
+        dashboardTelemetry.addData("I", KMoveI);
+        dashboardTelemetry.addData("D",KMoveD);
+        dashboardTelemetry.addData("F", KMoveF);
 
-        xPosController = new PIDFController(kP,kI,kD,kP);
-        yPosController = new PIDFController(kP,kI,kD,kP);
+        xPosController = new PIDFController(KMoveP, KMoveI,KMoveD, KMoveF);
+        yPosController = new PIDFController(KMoveP, KMoveI,KMoveD, KMoveF);
+        hPosController = new PIDFController(KTurnP, KTurnI,KTurnD, KTurnF);
         Otos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
         configureOtos();
 
-        MoveRobot(10,5);
+        turnRobot(-179);
     }
 
 
@@ -109,7 +117,7 @@ public class PIDAuto extends LinearOpMode {
         // multiple speeds to get an average, then set the linear scalar to the
         // inverse of the error. For example, if you move the robot 100 inches and
         // the sensor reports 103 inches, set the linear scalar to 100/103 = 0.971
-        Otos.setLinearScalar(1.0); //TODO Linear scaler needs to be tuned
+        Otos.setLinearScalar(0.9);
         Otos.setAngularScalar(0.9);
 
         // The IMU on the OTOS includes a gyroscope and accelerometer, which could
@@ -142,12 +150,23 @@ public class PIDAuto extends LinearOpMode {
 
     }
 
+
+
+    public void turnRobot(double hPosSetpoint){
+        double hPos = Otos.getPosition().h;
+        while(hPos != hPosSetpoint){
+            UpdateAutoTelemtry(0, 0, hPosSetpoint);
+            double hOutput = hPosController.calculate(hPos,hPosSetpoint);
+            setMotorSpeeds(0,hOutput,0);
+        }
+    }
     public void MoveRobot(double xPosSetpoint, double yPosSetpoint){
         double xPos = Otos.getPosition().x;
         double yPos = Otos.getPosition().y;
 
+
         while(xPos != xPosSetpoint || yPos != yPosSetpoint){
-            UpdateAutoTelemtry(xPosSetpoint, yPosSetpoint);
+            UpdateAutoTelemtry(xPosSetpoint, yPosSetpoint, 0);
 
             double xOutput = xPosController.calculate(xPos,xPosSetpoint);
             double yOutput = yPosController.calculate(yPos,yPosSetpoint);
@@ -197,13 +216,15 @@ public class PIDAuto extends LinearOpMode {
 
 
     }
-    public void UpdateAutoTelemtry(double xPosSetpoint, double yPosSetpoint){
+    public void UpdateAutoTelemtry(double xPosSetpoint, double yPosSetpoint,double hPosSetpoint){
         dashboardTelemetry.addData("xPosSetpoint", xPosSetpoint);
         dashboardTelemetry.addData("yPosSetpoint", yPosSetpoint);
+        dashboardTelemetry.addData("hPosSetpoint", hPosSetpoint);
 
 
         dashboardTelemetry.addData("pos x", Otos.getPosition().x);
         dashboardTelemetry.addData("pos y", Otos.getPosition().y);
+        dashboardTelemetry.addData("pos h", Otos.getPosition().h);
 
         dashboardTelemetry.update();
 
