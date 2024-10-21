@@ -14,7 +14,10 @@ import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+
+import org.openftc.easyopencv.PipelineRecordingParameters;
 
 import Command_Based_TeleOp_2024_08_17.Commands.MoveShoulderCMD;
 import Command_Based_TeleOp_2024_08_17.Commands.PowerVacuumCMD;
@@ -52,7 +55,7 @@ public class RobotContainer extends CommandOpMode {
 
     private  VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
     private ShoulderSubsystem shoulderSub;
-
+    private Motor.Encoder armEncoder;
     public GamepadEx driverOP;
     public Button vacuumButton;
     public GamepadButton moveShouldertoBottomPos;
