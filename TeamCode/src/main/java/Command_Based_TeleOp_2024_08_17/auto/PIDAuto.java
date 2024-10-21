@@ -20,7 +20,7 @@ public class PIDAuto extends LinearOpMode {
     public static double KMoveD = 0;
     public static double KMoveF = 0;
 
-    public static double KTurnP = 0.1;
+    public static double KTurnP = 0.001;
     public static double KTurnI = 0;
     public static double KTurnD = 0;
     public static double KTurnF = 0;
@@ -66,9 +66,16 @@ public class PIDAuto extends LinearOpMode {
         yPosController = new PIDFController(KMoveP, KMoveI,KMoveD, KMoveF);
         hPosController = new PIDFController(KTurnP, KTurnI,KTurnD, KTurnF);
         Otos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
+        dashboardTelemetry.addData("hPosSetpoint", 0);
+
+        dashboardTelemetry.addData("Turning P",0);
+        dashboardTelemetry.addData("Turning I", 0);
+        dashboardTelemetry.addData("Turning D", 0);
+        dashboardTelemetry.addData("Turning F", 0);
         configureOtos();
 
-        turnRobot(-179);
+        turnRobot(90);
+
     }
 
 
@@ -154,9 +161,12 @@ public class PIDAuto extends LinearOpMode {
 
     public void turnRobot(double hPosSetpoint){
         double hPos = Otos.getPosition().h;
-        while(hPos != hPosSetpoint){
-            UpdateAutoTelemtry(0, 0, hPosSetpoint);
-            double hOutput = hPosController.calculate(hPos,hPosSetpoint);
+        double hOutput = hPosController.calculate(hPos,hPosSetpoint);
+        while(!hPosController.atSetPoint()){
+            hPos = Otos.getPosition().h;
+            UpdateAutoTelemetry(0, 0, hPosController);
+            hOutput = hPosController.calculate(hPos,hPosSetpoint);
+            dashboardTelemetry.addData("hOutput",hOutput);
             setMotorSpeeds(0,hOutput,0);
         }
     }
@@ -166,7 +176,7 @@ public class PIDAuto extends LinearOpMode {
 
 
         while(xPos != xPosSetpoint || yPos != yPosSetpoint){
-            UpdateAutoTelemtry(xPosSetpoint, yPosSetpoint, 0);
+            UpdateAutoTelemetry(xPosSetpoint, yPosSetpoint, hPosController);
 
             double xOutput = xPosController.calculate(xPos,xPosSetpoint);
             double yOutput = yPosController.calculate(yPos,yPosSetpoint);
@@ -216,15 +226,21 @@ public class PIDAuto extends LinearOpMode {
 
 
     }
-    public void UpdateAutoTelemtry(double xPosSetpoint, double yPosSetpoint,double hPosSetpoint){
+    public void UpdateAutoTelemetry(double xPosSetpoint, double yPosSetpoint, PIDFController hController){
         dashboardTelemetry.addData("xPosSetpoint", xPosSetpoint);
         dashboardTelemetry.addData("yPosSetpoint", yPosSetpoint);
-        dashboardTelemetry.addData("hPosSetpoint", hPosSetpoint);
+        dashboardTelemetry.addData("hPosSetpoint", hController.getSetPoint());
 
 
         dashboardTelemetry.addData("pos x", Otos.getPosition().x);
         dashboardTelemetry.addData("pos y", Otos.getPosition().y);
         dashboardTelemetry.addData("pos h", Otos.getPosition().h);
+
+        dashboardTelemetry.addData("Turning P", hController.getP());
+        dashboardTelemetry.addData("Turning I", hController.getI());
+        dashboardTelemetry.addData("Turning D", hController.getD());
+        dashboardTelemetry.addData("Turning F", hController.getF());
+
 
         dashboardTelemetry.update();
 
