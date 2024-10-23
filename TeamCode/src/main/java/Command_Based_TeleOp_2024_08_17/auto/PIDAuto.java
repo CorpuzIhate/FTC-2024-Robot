@@ -7,6 +7,7 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -20,10 +21,16 @@ public class PIDAuto extends LinearOpMode {
     public static double KMoveD = 0;
     public static double KMoveF = 0;
 
-    public static double KTurnP = 0.1;
+    public static double KTurnP = 0.01;
     public static double KTurnI = 0;
     public static double KTurnD = 0;
     public static double KTurnF = 0;
+
+    public static double offsetX = -4.17;
+    public static double offsetY = 4.91;
+    public static double offsetH = 0;
+
+    public static double setPoint = 0;
     private  PIDFController xPosController;
     private  PIDFController yPosController;
     private  PIDFController hPosController;
@@ -37,6 +44,8 @@ public class PIDAuto extends LinearOpMode {
 
     private final FtcDashboard dashboard = FtcDashboard.getInstance();
     private final Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
+    private final ElapsedTime runtime = new ElapsedTime();
 
 
     @Override
@@ -66,9 +75,20 @@ public class PIDAuto extends LinearOpMode {
         yPosController = new PIDFController(KMoveP, KMoveI,KMoveD, KMoveF);
         hPosController = new PIDFController(KTurnP, KTurnI,KTurnD, KTurnF);
         Otos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
+        dashboardTelemetry.addData("hPosSetpoint", 0);
+
+        dashboardTelemetry.addData("Turning P",0);
+        dashboardTelemetry.addData("Turning I", 0);
+        dashboardTelemetry.addData("Turning D", 0);
+        dashboardTelemetry.addData("Turning F", 0);
         configureOtos();
 
-        turnRobot(-179);
+        dashboardTelemetry.addData("angular scaler",Otos.getAngularScalar());
+        dashboardTelemetry.addData("linear scaler",Otos.getLinearScalar());
+        waitForStart();
+      //  turnRobot(96); // 90 degrees
+        moveRobot(10,0);
+
     }
 
 
@@ -83,7 +103,7 @@ public class PIDAuto extends LinearOpMode {
         // persisted in the sensor, so you need to set at the start of all your
         // OpModes if using the non-default value.
         // myOtos.setLinearUnit(DistanceUnit.METER);
-        Otos.setLinearUnit(DistanceUnit.METER);
+        Otos.setLinearUnit(DistanceUnit.INCH);
         // myOtos.setAngularUnit(AnguleUnit.RADIANS);
         Otos.setAngularUnit(AngleUnit.DEGREES);
 
@@ -98,8 +118,9 @@ public class PIDAuto extends LinearOpMode {
         // clockwise (negative rotation) from the robot's orientation, the offset
         // would be {-5, 10, -90}. These can be any value, even the angle can be
         // tweaked slightly to compensate for imperfect mounting (eg. 1.3 degrees).
-        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0, 0, 0);
+        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(offsetX, offsetY, offsetH);
         Otos.setOffset(offset);
+
 
         // Here we can set the linear and angular scalars, which can compensate for
         // scaling issues with the sensor measurements. Note that as of firmware
@@ -118,7 +139,7 @@ public class PIDAuto extends LinearOpMode {
         // inverse of the error. For example, if you move the robot 100 inches and
         // the sensor reports 103 inches, set the linear scalar to 100/103 = 0.971
         Otos.setLinearScalar(0.9);
-        Otos.setAngularScalar(0.9);
+        Otos.setAngularScalar(1.07);
 
         // The IMU on the OTOS includes a gyroscope and accelerometer, which could
         // have an offset. Note that as of firmware version 1.0, the calibration
@@ -133,7 +154,7 @@ public class PIDAuto extends LinearOpMode {
         Otos.calibrateImu();
 
         // Reset the tracking algorithm - this resets the position to the origin,
-        // but can also be used to recover from some rare tracking errors
+        // but can also be used to recover from some rare tracking erro rs
         Otos.resetTracking();
 
         // After resetting the tracking, the OTOS will report that the robot is at
@@ -148,46 +169,65 @@ public class PIDAuto extends LinearOpMode {
         SparkFunOTOS.Version fwVersion = new SparkFunOTOS.Version();
         Otos.getVersionInfo(hwVersion, fwVersion);
 
+        dashboardTelemetry.addData("offsetsX", Otos.getOffset().x);
+        dashboardTelemetry.addData("offsetsY", Otos.getOffset().y);
+        dashboardTelemetry.addData("offsetsH", Otos.getOffset().h);
+
     }
 
 
 
     public void turnRobot(double hPosSetpoint){
+
         double hPos = Otos.getPosition().h;
-        while(hPos != hPosSetpoint){
-            UpdateAutoTelemtry(0, 0, hPosSetpoint);
-            double hOutput = hPosController.calculate(hPos,hPosSetpoint);
-            setMotorSpeeds(0,hOutput,0);
+        double hOutput = hPosController.calculate(hPos,hPosSetpoint);
+        while(!hPosController.atSetPoint()){
+            hPos = Otos.getPosition().h;
+            UpdateAutoTelemetry(0, 0, hPosController);
+
+
+            hOutput = hPosController.calculate(hPos,hPosSetpoint);
+            dashboardTelemetry.addData("hOutput",hOutput);
+
+            setMotorSpeeds(0,-hOutput,0);
         }
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
     }
-    public void MoveRobot(double xPosSetpoint, double yPosSetpoint){
+    public void moveRobot(double xPosSetpoint, double yPosSetpoint){
         double xPos = Otos.getPosition().x;
         double yPos = Otos.getPosition().y;
 
+        double xOutput = xPosController.calculate(xPos,xPosSetpoint);
+        double yOutput = yPosController.calculate(yPos,yPosSetpoint);
+
+
 
         while(xPos != xPosSetpoint || yPos != yPosSetpoint){
-            UpdateAutoTelemtry(xPosSetpoint, yPosSetpoint, 0);
+            UpdateAutoTelemetry(xPosSetpoint, yPosSetpoint, hPosController);
 
-            double xOutput = xPosController.calculate(xPos,xPosSetpoint);
-            double yOutput = yPosController.calculate(yPos,yPosSetpoint);
-            setMotorSpeeds(xOutput,yOutput , 0);
+            xOutput = xPosController.calculate(xPos,xPosSetpoint);
+            yOutput = yPosController.calculate(yPos,yPosSetpoint);
+            setMotorSpeeds(0.5,0, 0);
         }
     }
 
 
 
-    public void setMotorSpeeds(double forwardPower, double strafePower,
-                               double rotationPower){
+    public void setMotorSpeeds(double forwardPower, double rotationPower,
+                               double strafePower){
 
         forwardPower *= -1;
-        strafePower *= -1;
         rotationPower *= -1;
+        strafePower *= -1;
 
 
-        double frontLeftSpeed = forwardPower - strafePower - rotationPower;
-        double backLeftSpeed = forwardPower + strafePower - rotationPower;
-        double frontRightSpeed = forwardPower + strafePower + rotationPower;
-        double backRightSpeed= forwardPower -strafePower + rotationPower;
+        double frontLeftSpeed = forwardPower - rotationPower - strafePower;
+        double backLeftSpeed = forwardPower + rotationPower - strafePower;
+        double frontRightSpeed = forwardPower + rotationPower + strafePower;
+        double backRightSpeed= forwardPower -rotationPower + strafePower;
 
         //math.max tale 2 doubles and figure out which one is higher
         // This is used to determine the current max speed as different sides of the robot
@@ -216,15 +256,21 @@ public class PIDAuto extends LinearOpMode {
 
 
     }
-    public void UpdateAutoTelemtry(double xPosSetpoint, double yPosSetpoint,double hPosSetpoint){
+    public void UpdateAutoTelemetry(double xPosSetpoint, double yPosSetpoint, PIDFController hController){
         dashboardTelemetry.addData("xPosSetpoint", xPosSetpoint);
         dashboardTelemetry.addData("yPosSetpoint", yPosSetpoint);
-        dashboardTelemetry.addData("hPosSetpoint", hPosSetpoint);
+        dashboardTelemetry.addData("hPosSetpoint", hController.getSetPoint());
 
 
         dashboardTelemetry.addData("pos x", Otos.getPosition().x);
         dashboardTelemetry.addData("pos y", Otos.getPosition().y);
         dashboardTelemetry.addData("pos h", Otos.getPosition().h);
+
+        dashboardTelemetry.addData("Turning P", hController.getP());
+        dashboardTelemetry.addData("Turning I", hController.getI());
+        dashboardTelemetry.addData("Turning D", hController.getD());
+        dashboardTelemetry.addData("Turning F", hController.getF());
+
 
         dashboardTelemetry.update();
 
