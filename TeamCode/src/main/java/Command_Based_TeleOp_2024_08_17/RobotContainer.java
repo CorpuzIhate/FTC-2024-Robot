@@ -118,10 +118,10 @@ public class RobotContainer extends CommandOpMode {
 
         //shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, shoulderMotor,telemetryManagerSub.getTelemetryObject() ));
 //
-//        vacuumIntakeButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, -1,ContinousVacuumServo))
-//                .whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
-//        vacuumOutakeButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo))
-//                .whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
+        vacuumIntakeButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, -1,ContinousVacuumServo))
+                .whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
+        vacuumOutakeButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo))
+               .whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
 
     }
 

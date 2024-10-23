@@ -7,6 +7,7 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -16,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Config
 @Autonomous
 public class PIDAuto extends LinearOpMode {
-    public static double KMoveP = 0.1;
+    public static double KMoveP = 0.06;
     public static double KMoveI = 0;
     public static double KMoveD = 0;
     public static double KMoveF = 0;
@@ -30,7 +31,9 @@ public class PIDAuto extends LinearOpMode {
     public static double offsetY = 4.91;
     public static double offsetH = 0;
 
-    public static double setPoint = 0;
+    public static double setPointX = 0;
+    public static double setPointY = 0;
+
     private  PIDFController xPosController;
     private  PIDFController yPosController;
     private  PIDFController hPosController;
@@ -66,6 +69,9 @@ public class PIDAuto extends LinearOpMode {
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
         dashboardTelemetry.addData("p", KMoveP);
         dashboardTelemetry.addData("I", KMoveI);
         dashboardTelemetry.addData("D",KMoveD);
@@ -74,6 +80,7 @@ public class PIDAuto extends LinearOpMode {
         xPosController = new PIDFController(KMoveP, KMoveI,KMoveD, KMoveF);
         yPosController = new PIDFController(KMoveP, KMoveI,KMoveD, KMoveF);
         hPosController = new PIDFController(KTurnP, KTurnI,KTurnD, KTurnF);
+
         Otos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
         dashboardTelemetry.addData("hPosSetpoint", 0);
 
@@ -86,8 +93,8 @@ public class PIDAuto extends LinearOpMode {
         dashboardTelemetry.addData("angular scaler",Otos.getAngularScalar());
         dashboardTelemetry.addData("linear scaler",Otos.getLinearScalar());
         waitForStart();
-      //  turnRobot(96); // 90 degrees
-        moveRobot(10,0);
+        //turnRobot(96); // 90 degrees
+        moveRobot(setPointX,setPointY);
 
     }
 
@@ -138,7 +145,9 @@ public class PIDAuto extends LinearOpMode {
         // multiple speeds to get an average, then set the linear scalar to the
         // inverse of the error. For example, if you move the robot 100 inches and
         // the sensor reports 103 inches, set the linear scalar to 100/103 = 0.971
-        Otos.setLinearScalar(0.9);
+
+        // actual distance divided traveled distance
+        Otos.setLinearScalar(1.01);
         Otos.setAngularScalar(1.07);
 
         // The IMU on the OTOS includes a gyroscope and accelerometer, which could
@@ -189,13 +198,14 @@ public class PIDAuto extends LinearOpMode {
             hOutput = hPosController.calculate(hPos,hPosSetpoint);
             dashboardTelemetry.addData("hOutput",hOutput);
 
-            setMotorSpeeds(0,-hOutput,0);
+            setMotorSpeeds(0,0,-hOutput);
         }
         frontLeft.setPower(0);
         frontRight.setPower(0);
         backLeft.setPower(0);
         backRight.setPower(0);
     }
+
     public void moveRobot(double xPosSetpoint, double yPosSetpoint){
         double xPos = Otos.getPosition().x;
         double yPos = Otos.getPosition().y;
@@ -205,29 +215,32 @@ public class PIDAuto extends LinearOpMode {
 
 
 
-        while(xPos != xPosSetpoint || yPos != yPosSetpoint){
+        while(!xPosController.atSetPoint() || !yPosController.atSetPoint() ){
+            xPos = Otos.getPosition().x;
+            yPos = Otos.getPosition().y;
+
             UpdateAutoTelemetry(xPosSetpoint, yPosSetpoint, hPosController);
 
             xOutput = xPosController.calculate(xPos,xPosSetpoint);
             yOutput = yPosController.calculate(yPos,yPosSetpoint);
-            setMotorSpeeds(0.5,0, 0);
+            setMotorSpeeds(xOutput,yOutput, 0);
         }
     }
 
 
 
-    public void setMotorSpeeds(double forwardPower, double rotationPower,
-                               double strafePower){
+    public void setMotorSpeeds(double forwardPower, double strafePower,
+                               double rotationPower){
 
         forwardPower *= -1;
-        rotationPower *= -1;
         strafePower *= -1;
+        rotationPower *= -1;
 
 
-        double frontLeftSpeed = forwardPower - rotationPower - strafePower;
-        double backLeftSpeed = forwardPower + rotationPower - strafePower;
-        double frontRightSpeed = forwardPower + rotationPower + strafePower;
-        double backRightSpeed= forwardPower -rotationPower + strafePower;
+        double frontLeftSpeed = forwardPower - strafePower - rotationPower;
+        double backLeftSpeed = forwardPower + strafePower - rotationPower;
+        double frontRightSpeed = forwardPower + strafePower + rotationPower;
+        double backRightSpeed= forwardPower -strafePower + rotationPower;
 
         //math.max tale 2 doubles and figure out which one is higher
         // This is used to determine the current max speed as different sides of the robot
