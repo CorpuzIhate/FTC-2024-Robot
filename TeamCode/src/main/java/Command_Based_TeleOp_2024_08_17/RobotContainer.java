@@ -132,7 +132,7 @@ public class RobotContainer extends CommandOpMode {
         // persisted in the sensor, so you need to set at the start of all your
         // OpModes if using the non-default value.
         // myOtos.setLinearUnit(DistanceUnit.METER);
-        Otos.setLinearUnit(DistanceUnit.METER);
+        Otos.setLinearUnit(DistanceUnit.INCH);
         // myOtos.setAngularUnit(AnguleUnit.RADIANS);
         Otos.setAngularUnit(AngleUnit.DEGREES);
 
