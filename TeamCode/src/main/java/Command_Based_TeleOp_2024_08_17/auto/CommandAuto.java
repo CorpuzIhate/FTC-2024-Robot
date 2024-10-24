@@ -1,78 +1,46 @@
-package Command_Based_TeleOp_2024_08_17;
-
+package Command_Based_TeleOp_2024_08_17.auto;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.PerpetualCommand;
-import com.arcrobotics.ftclib.command.button.Button;
-import com.arcrobotics.ftclib.command.button.GamepadButton;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import Command_Based_TeleOp_2024_08_17.Commands.PowerVacuumCMD;
-import Command_Based_TeleOp_2024_08_17.Commands.TeleOpJoystickRobotCentricCMD;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import Command_Based_TeleOp_2024_08_17.Commands.TelemetryManagerCMD;
 import Command_Based_TeleOp_2024_08_17.Subsystems.MecanumDriveBaseSubsystem;
 import Command_Based_TeleOp_2024_08_17.Subsystems.ShoulderSubsystem;
 import Command_Based_TeleOp_2024_08_17.Subsystems.TelemetryManagerSubsystem;
 import Command_Based_TeleOp_2024_08_17.Subsystems.VacuumSubsystem;
+@Autonomous
+public class CommandAuto extends CommandOpMode {
+    public Motor frontLeft;
+    public Motor frontRight;
+    public Motor backLeft;
+    public Motor backRight;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+    public Motor shoulderMotor;
 
-@TeleOp(name = "Command Base Test")
-public class RobotContainer extends CommandOpMode {
-
-
-
-    private BNO055IMU imu;
-
-
-    double fwdPwr;
-    double strafePwr;
-    double rotationPwr;
-
-    Motor frontLeft;
-    Motor frontRight;
-    Motor backLeft;
-    Motor backRight;
-    Motor shoulderMotor;
-
-    ServoEx targetVacuumServo;
     CRServo ContinousVacuumServo;
-
-    public GamepadEx driverOP;
-    public Button vacuumIntakeButton;
-    public Button vacuumOutakeButton;
 
     public SparkFunOTOS Otos;
 
     private MecanumDriveBaseSubsystem mecanumDriveBaseSub;
+    private TelemetryManagerSubsystem telemetryManagerSub;
+    private VacuumSubsystem vacuumSubsystem;
+    private ShoulderSubsystem shoulderSub;
 
-    private final TelemetryManagerSubsystem telemetryManagerSub = new TelemetryManagerSubsystem();
-    private  final VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
-    private final ShoulderSubsystem shoulderSub = new  ShoulderSubsystem(shoulderMotor);
 
     @Override
     public void initialize() {
-        fwdPwr = -gamepad1.left_stick_y;
-        strafePwr = -gamepad1.left_stick_x;
-        rotationPwr = -gamepad1.right_stick_x;
-
-        //TODO move motor, sensor and IMU setups into their subsystem
-        //TODO put constant tags into constants
         frontLeft = new Motor(hardwareMap, "front_left");
         frontRight = new Motor(hardwareMap, "front_right");
         backLeft = new Motor(hardwareMap, "back_left");
         backRight = new Motor(hardwareMap, "back_right");
-
-        mecanumDriveBaseSub = new MecanumDriveBaseSubsystem(frontLeft, frontRight
-                ,backRight, backLeft);
 
         shoulderMotor = new Motor(hardwareMap,"shoulder_motor");
         shoulderMotor.setRunMode(Motor.RunMode.RawPower);
@@ -84,47 +52,25 @@ public class RobotContainer extends CommandOpMode {
         frontRight.setRunMode(Motor.RunMode.RawPower);
         backLeft.setRunMode(Motor.RunMode.RawPower);
         backRight.setRunMode(Motor.RunMode.RawPower);
-
-
-
         backLeft.setInverted(true);
         backRight.setInverted(true);
-        driverOP = new GamepadEx(gamepad1);
-        vacuumIntakeButton = new GamepadButton(driverOP, GamepadKeys.Button.A);
-        vacuumOutakeButton = new GamepadButton(driverOP, GamepadKeys.Button.B);
-
-
-        BNO055IMU.Parameters myIMUparameters;
-
-        myIMUparameters = new BNO055IMU.Parameters();
-
-
-        myIMUparameters.angleUnit = myIMUparameters.angleUnit.RADIANS;
-        myIMUparameters.calibrationDataFile = "BNO055IMUCalibration.json";
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(myIMUparameters);
 
         Otos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
         configureOtos();
 
+
         telemetryManagerSub.setDefaultCommand(new PerpetualCommand(new TelemetryManagerCMD(telemetryManagerSub, Otos)));
-
-
-
-
-
-        mecanumDriveBaseSub.setDefaultCommand(new TeleOpJoystickRobotCentricCMD(mecanumDriveBaseSub,
-                telemetryManagerSub.getTelemetryObject(), driverOP::getLeftY, driverOP::getLeftX, driverOP::getRightX));
-
-        //shoulderSub.setDefaultCommand(new MoveShoulderCMD(shoulderSub, shoulderMotor,telemetryManagerSub.getTelemetryObject() ));
-//
-        vacuumIntakeButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, -1,ContinousVacuumServo))
-                .whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
-        vacuumOutakeButton.whileHeld(new PowerVacuumCMD(vacuumSubsystem, 1,ContinousVacuumServo))
-               .whenReleased(new PowerVacuumCMD(vacuumSubsystem, 0,ContinousVacuumServo));
 
     }
 
+
+    private void initSubsystems(){
+        mecanumDriveBaseSub = new MecanumDriveBaseSubsystem(frontLeft, frontRight
+                ,backRight, backLeft);
+        TelemetryManagerSubsystem telemetryManagerSub = new TelemetryManagerSubsystem();
+        VacuumSubsystem vacuumSubsystem = new VacuumSubsystem();
+        ShoulderSubsystem shoulderSub = new  ShoulderSubsystem(shoulderMotor);
+    }
 
     private void configureOtos(){
         // Set the desired units for linear and angular measurements. Can be either
@@ -167,8 +113,8 @@ public class RobotContainer extends CommandOpMode {
         // multiple speeds to get an average, then set the linear scalar to the
         // inverse of the error. For example, if you move the robot 100 inches and
         // the sensor reports 103 inches, set the linear scalar to 100/103 = 0.971
-        Otos.setLinearScalar(0.9);
-        Otos.setAngularScalar(0.9);
+        Otos.setLinearScalar(1.01);
+        Otos.setAngularScalar(1.07);
 
         // The IMU on the OTOS includes a gyroscope and accelerometer, which could
         // have an offset. Note that as of firmware version 1.0, the calibration
@@ -199,8 +145,6 @@ public class RobotContainer extends CommandOpMode {
         Otos.getVersionInfo(hwVersion, fwVersion);
 
     }
-
-
 
 
 }
